@@ -482,7 +482,7 @@ fus_spanning_reads_boxplot =  ggplot(fus.all, aes(x = factor(sample), y = as.num
   scale_y_continuous(trans='log10') +
   theme_bw(base_size = 18) + 
   theme(panel.grid.minor = element_blank(),axis.text.x = element_text(margin=margin(5, b = 10), angle = 90, vjust = 0.5, hjust=1))+
-  scale_fill_viridis_d(alpha=0.6)+
+  scale_fill_viridis_d(alpha=0.6, option="turbo")+
   ggtitle("Number of reads spanning fusions") + 
   xlab("sample") + ylab("spanning reads") + labs(fill = "Sample") +
   theme(aspect.ratio = 1/1.618)
@@ -559,7 +559,7 @@ pca_plot=ggplot(pca_data, aes(PC1, PC2, color=name)) +
   ylab(paste0("PC2: ",percentVar[2],"% variance")) + 
   theme_bw(base_size = 18) + 
   theme(panel.grid.minor = element_blank() )+
-  scale_color_viridis_d(alpha=0.6)+
+  scale_color_viridis_d(alpha=0.6, option="turbo")+
   coord_fixed(ratio = 1) + theme(aspect.ratio = 1) 
 
 figurecapPCA="PCA plot. VST-transformed count estimates scaled to library size were used for calculations."
@@ -639,8 +639,8 @@ hm5=pheatmap(dat_hm_var)
 #figurecap3="Heatmap of rlog-transformed and library size-scaled log-counts for top 60 genes, selected by expression."
 #figurecap4="Heatmap of rlog-transformed and library size-scaled log-counts for top 60 genes, selected by variance."
 
-figurecap_hm1="Heatmaps of vst-transformed and library size-scaled log-counts for top 60 genes, selected by expression. A - z-scored log-counts (scaled by row to show deviation from the row average); A - unscaled log-counts."
-figurecap_hm2="Heatmaps of vst-transformed and library size-scaled log-counts for top 60 genes, selected by variance. A - z-scored log-counts (scaled by row to show deviation from the row average); A - unscaled log-counts."
+figurecap_hm1="Heatmaps of vst-transformed and library size-scaled log-counts for top 60 genes, selected by expression. A - z-scored log-normalised counts (scaled by row to show deviation from the row average); B - log-normalised counts."
+figurecap_hm2="Heatmaps of vst-transformed and library size-scaled log-counts for top 60 genes, selected by variance. A - z-scored log-normalised counts (scaled by row to show deviation from the row average); B - log-normalised counts."
 
 
 hm2=pheatmap(dat_hm_exprs, cluster_rows=TRUE, column_title="B", heatmap_legend_param=list(title="Logcounts"),fontsize_row = 7, fontsize_col = 7,color=colorRampPalette(brewer.pal(6,name="PuOr"))(12))

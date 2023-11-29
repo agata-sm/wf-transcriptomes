@@ -109,7 +109,7 @@ Samples included in this report are **`r smpls_pths$sample`**.
 
 * Genome reference sequence `Homo_sapiens.GRCh38.dna.primary_assembly.fa` was obtained from Ensembl;
 
-* Gene models `Homo_sapiens.GRCh38.109.gtf` were obtained from Ensembl;
+* Gene models `Homo_sapiens.GRCh38.109.gtf` were obtained from Ensembl and used for transcriptome quantification by `salmon`;
 
 * Reference transcriptome sequence was obtained from the above files using `gffread` [@gffread]:
 
@@ -123,7 +123,7 @@ Samples included in this report are **`r smpls_pths$sample`**.
 * Host genome reference sequence for read filtering was `Mus_musculus.GRCm39.dna.primary_assembly.fa` obtained from Ensembl.
 ```
 
-* Gene model annotations from **Gencode v 34** were used for Gene fusion detection.
+* Gene model annotations from **Gencode v 44** were used for gene fusion detection by `JAFFAL`.
 
 
 ## Methods
@@ -152,9 +152,14 @@ where `params.minimum_mapping_quality` was set to `q=40`, which is the default v
 salmon quant --noErrorModel -p 5 -t "${ref_transcriptome}" -l SF -a "${bam}" -o $smpl_name_out
 ```
 
+This command was used as in the differential expression module of the original `wf-transcriptomes`;
+
+
 * Counts were imported and summarised at the gene level using `tximport` [@tximport]. The transcript-to-gene mappings were retrieved from Bioconductor `AnnotationHub` package; Ensembl v 107 database was used (the most recent available for version of R / Bioconductor used, data stamp 2022-04-25). Gene count data was further processed uisng `DESeq2` [@deseq2]: normalised by scaling to library size and transformed to log2 scale. vst-transformed counts (in mode "blind" agnostic to sample grouping) were used for heatmap plotting and PCA. This workflow is equivalent to one included in Oxford Nanopore processing pipeline `wf-transcriptomes` [@wftranscriptomes] except that no DGE is performed;
 
-* For alignement statistics, reads were mapped to the reference genome using `minimap2` outputting all reads (i.e. mapped and unmapped) and the alignments were filtered and counted using `samtools`. No quality filtering was applied at this step.
+* For alignment statistics, reads were mapped to the reference genome using `minimap2` outputting all reads (i.e. mapped and unmapped) and the alignments were filtered and counted using `samtools` for an estimate of number of "good quality alignments". The filtering was applied only to obtain read mapping statistics for summary table; *Primary alignments* were filtered based on MAPQ (alignment quality) and the cutoff was `-q 60`.
+
+* Alignment quality filtering applied in the processing workflow was as per default settings for each tool, and the corresponding alignment numbers are not listed in the summary table. 
 
 * Gene  / transcript fusions were detected using `JAFFAL`, version of `JAFFA` implemented for long reads. `JAFFA` is a multi-step pipeline that takes a transcript-centric approach to detect gene fusions (takes raw RNA-Seq reads, and searches for transcript fusions using exon annotations). `JAFFA` is based on the idea of comparing a transcriptome (e.g. in a cancer sample) against a reference transcriptome [@jaffal].
 
