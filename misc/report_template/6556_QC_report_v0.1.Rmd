@@ -48,7 +48,9 @@ knitr::opts_chunk$set(echo = FALSE,
 script_pth="./6556_qcreport_v0.1.R"
 knitr::read_chunk(script_pth)
 
-#source("./6577_report_functions.R")
+knitr::opts_chunk$set(cache.path = wrk.dir)
+
+#source("./report_functions.R")
 ```
 
 
@@ -90,6 +92,11 @@ This document collects descriptive statistics and quality metrics from `wf-trans
 Samples included in this report are **`r smpls_pths$sample`**.
 
 
+```{asis, echo=is.xenofilt}
+***This report was generated using data processed with pipeline which included host reads filtering.***
+```
+
+
 
 <br />
 <br />
@@ -112,12 +119,23 @@ Samples included in this report are **`r smpls_pths$sample`**.
 ```
 
 
+```{asis, echo=is.xenofilt}
+* Host genome reference sequence for read filtering was `Mus_musculus.GRCm39.dna.primary_assembly.fa` obtained from Ensembl.
+```
+
+* Gene model annotations from **Gencode v 34** were used for Gene fusion detection.
+
+
 ## Methods
 
-Pipeline `wf-transcriptomes` [@wftranscriptomes] was used for data processing, after introducing minor changes pertaining to Rackham architecture and software and adding mapping reads to transcriptone and quantification as separate steps. The modified pipeline is available at `https://github.com/agata-sm/wf-transcriptomes`. OBS! Branch `v2023` was used for data procesing workflow used in this report.
+Pipeline `wf-transcriptomes` [@wftranscriptomes] was used for data processing, after introducing minor changes pertaining to Rackham architecture and software and adding mapping reads to transcriptone and quantification as separate steps. The modified pipeline is available at `https://github.com/agata-sm/wf-transcriptomes`. 
 
 
 * Reads were preprocessed using `pychopper` to remove barcodes and orient strandness [@pychopper];
+
+```{asis, echo=is.xenofilt}
+* Host reads were removed comparing edit distance calculated based on the number of mismatches to the graft and host reference sequences as implemented in `XenofilteR` [@xenofilter].
+```
 
 * Processed reads were mapped to reference transcriptome using `minimap` in a splice-aware manner [@minimap2]:
 
@@ -137,6 +155,10 @@ salmon quant --noErrorModel -p 5 -t "${ref_transcriptome}" -l SF -a "${bam}" -o 
 * Counts were imported and summarised at the gene level using `tximport` [@tximport]. The transcript-to-gene mappings were retrieved from Bioconductor `AnnotationHub` package; Ensembl v 107 database was used (the most recent available for version of R / Bioconductor used, data stamp 2022-04-25). Gene count data was further processed uisng `DESeq2` [@deseq2]: normalised by scaling to library size and transformed to log2 scale. vst-transformed counts (in mode "blind" agnostic to sample grouping) were used for heatmap plotting and PCA. This workflow is equivalent to one included in Oxford Nanopore processing pipeline `wf-transcriptomes` [@wftranscriptomes] except that no DGE is performed;
 
 * For alignement statistics, reads were mapped to the reference genome using `minimap2` outputting all reads (i.e. mapped and unmapped) and the alignments were filtered and counted using `samtools`. No quality filtering was applied at this step.
+
+* Gene  / transcript fusions were detected using `JAFFAL`, version of `JAFFA` implemented for long reads. `JAFFA` is a multi-step pipeline that takes a transcript-centric approach to detect gene fusions (takes raw RNA-Seq reads, and searches for transcript fusions using exon annotations). `JAFFA` is based on the idea of comparing a transcriptome (e.g. in a cancer sample) against a reference transcriptome [@jaffal].
+
+
 
 
 
@@ -158,16 +180,39 @@ salmon quant --noErrorModel -p 5 -t "${ref_transcriptome}" -l SF -a "${bam}" -o 
 ```{r read-stats-data, include=FALSE, cache=TRUE, cache.lazy = FALSE}
 ```
 
-Read length distribution is presented on the histograms.
+Read length distribution in `pychopper` output (strand-corrected) is presented on the histograms.
 To focus on the plot region with most of data points, the x axis was limted to `r xlim_readlen` .
 
 
+```{asis, echo=is.xenofilt}
+These data contain both graft and host read pools.
+```
 
 
 ```{r, dev='png', echo=FALSE, fig.show='show',fig.dim=c(15, 15), cache=FALSE, fig.cap=figurecapreadlen}
   cowplot::plot_grid(plotlist=rlen_list,
     ncol=2, labels=LETTERS[1:n_smpls])
 ```
+
+## Host read removal
+
+
+```{asis, echo=!is.xenofilt}
+Host read filtering was not performed.
+```
+
+
+```{asis, echo=is.xenofilt}
+Summary of reads classified as host and removed is given in table in the next section.
+```
+
+
+
+```{r summary-host-filt, eval=is.xenofilt, echo=FALSE, include=FALSE}
+
+```
+
+
 
 
 <br />
@@ -177,12 +222,29 @@ To focus on the plot region with most of data points, the x axis was limted to `
 Read mapping statistics are presented in table below. Please note that, unlike in the processing pipeline, in this summary reads were not subject to quality filtering after the alignment step, unless indicated with suffix `filtered`.
 
 
+```{asis, echo=is.xenofilt}
+Host reads were removed from data used in this analysis.
+```
+
+
+
 ```{r read-map-stats-data, include=FALSE,cache=FALSE}
 
 ```
 
 
-```{r include=TRUE,cache=FALSE, results='asis'}
+
+```{r include=TRUE,cache=FALSE,eval=is.xenofilt, results='asis'}
+rlen_map[cols_tab1] %>% 
+  kable(booktabs = TRUE, row.names = FALSE, caption = tab.title.1, col.names=newnames.1) %>% 
+  kable_minimal(full_width = TRUE) %>% 
+  footnote(general = "Alignments were filtered using MAPQ cutoff 40, where indicated; otherwise no MAPQ filter was applied.")%>% 
+  footnote(general = "Filtering host reads also removed reads unmapped to neither graft nor host references.")
+```
+
+
+
+```{r include=TRUE,cache=FALSE,eval=!is.xenofilt, results='asis'}
 rlen_map[cols_tab1] %>% 
   kable(booktabs = TRUE, row.names = FALSE, caption = tab.title.1, col.names=newnames.1) %>% 
   kable_minimal(full_width = TRUE) %>% 
@@ -215,11 +277,30 @@ rlen_map[cols_tab2] %>%
 Transcript fusions statistics are presented in table below. Top 5 fusions, by number of spanning reads are listed in table below.
 
 
+`JAFFAL` classifies detected fusions to four categories:
+
+* **HighConfidence** - aligns to exons and has at least one spanning read and one spanning pair (paired-end data) or multiple spanning reads (single-end data);
+
+* **MediumConfidence** - aligns to exons and has at least two spanning read;
+    
+* **LowConfidence** - does not align to exons but has at least one spanning read and one spanning pair (paired-end data) or multiple spanning reads (single-end data);
+
+* **PotentialTransSplicing** - aligns to exons, has one spanning read and no spanning pairs. These are often seen in healthy samples.
+
+
+
+
+```{asis, echo=is.xenofilt}
+Host reads were removed from data used in this analysis.
+```
+
+
+
 ```{r include=TRUE,cache=FALSE, results='asis'}
 fusions_stats %>% 
   kable(booktabs = TRUE, row.names = FALSE, caption = tab.title.3, col.names=newnames.3) %>% 
   kable_minimal(full_width = TRUE) %>% 
-  footnote(general = "CO 5 - fusions detected with at least 5 spanning reads.")
+  footnote(general = "HighConfidence - fusions classified as High Confidence by JAFFAL.")
 ```
 
 
@@ -255,6 +336,12 @@ fus_spanning_reads_boxplot
 ## Transcriptome Profiling
 
 ### Data Exploration and Summary Statistics
+
+
+
+```{asis, echo=is.xenofilt}
+Host reads were removed from data used in this analysis.
+```
 
 
 ```{r salmon-data, include=FALSE,cache=FALSE}
@@ -294,6 +381,12 @@ pca_plot
 
 
 ### Gene Expression
+
+
+```{asis, echo=is.xenofilt}
+Host reads were removed from data used in this analysis.
+```
+
 
 
 ```{r heatmaps-data, include=FALSE,cache=FALSE}
