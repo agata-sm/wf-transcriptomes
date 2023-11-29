@@ -584,7 +584,7 @@ boxplot_gene_counts=ggplot(fpm.all.long, aes(x =sample, y =fpm, fill = sample)) 
   scale_y_continuous(trans='log10') +
   theme_bw(base_size = 18) + 
   theme(panel.grid.minor = element_blank(),axis.text.x = element_text(margin=margin(5, b = 10), angle = 90, vjust = 0.5, hjust=1))+
-  scale_fill_viridis_d(alpha=0.6)+
+  scale_fill_viridis_d(alpha=0.6, option="turbo")+
   ggtitle("Scaled counts per million") + 
   theme(aspect.ratio = 1/1.618)
 
