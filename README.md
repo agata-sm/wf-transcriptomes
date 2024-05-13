@@ -45,6 +45,33 @@ params.clustalloc="naiss1234-56-789"
 ```
 
 
+## Filtering host reads
+
+This part is used for xenograft-derived data. `XenofilteR` is used for removal of host reads, with settings adjusted for long reads.
+
+`XenofilteR` is run via container at `docker://agatasm/xenofilter`.
+
+The command to run the workflow with this subworkflow included is:
+
+```
+nextflow run $pipelineDir/main.nf \
+	  --fastq $fastqdir \
+	  --ref_genome $fa \
+	  --ref_annotation $gtf \
+ 	  --jaffal_refBase ${refdir}/JAFFA_gencode_44 \
+          --jaffal_genome hg38 \
+          --jaffal_annotation "genCode44" \
+          --out_dir $outdir \
+          --host_filter \
+	  --ref_genome_host $fa_host \
+          -profile singularity,slurm \
+          --pychopper_opts '-k PCS111 -m edlib'
+
+```
+
+
+
+
 ## Original readme
 
 This repository contains a [nextflow](https://www.nextflow.io/) workflow
