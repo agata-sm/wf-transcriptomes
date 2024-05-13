@@ -44,12 +44,13 @@ To use profile `slurm`, a local `nextflow.config` file should be provided with:
 params.clustalloc="naiss1234-56-789"
 ```
 
+## Project specific additions
 
-## Filtering host reads
+### Filtering host reads
 
 This part is used for xenograft-derived data. `XenofilteR` is used for removal of host reads, with settings adjusted for long reads.
 
-`XenofilteR` is run via container at `docker://agatasm/xenofilter`.
+`XenofilteR` is run via container at `docker://agatasm/xenofilter`. Docker file is included at `misc/docker/xenofilter`.
 
 The command to run the workflow with this subworkflow included is:
 
@@ -68,6 +69,11 @@ nextflow run $pipelineDir/main.nf \
           --pychopper_opts '-k PCS111 -m edlib'
 
 ```
+
+### Modified JAFFAL
+
+Due to data quality issues it was necessary to include hardcoded flag for phred score base 33 (`qin=33`) in JAFFAL pipeline (`ReformatReads`). JAFFAL can be run separately from the pipeline using docker container at `docker://agatasm/jaffa-2.4_dev:latest`. The docker file is at `misc/docker/jaffal_modified`.
+
 
 
 
