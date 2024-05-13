@@ -7,7 +7,7 @@ Changes:
 1. add SLURM as job scheduler;
 2. modify resource usage to work on Rackham
 3. hardcoded the path to Singularity/Apptainer image in `nextflow.config`, which was pulled manually from docker hub;
-4. 
+4. add filtering off host reads
 
 Usage:
 
