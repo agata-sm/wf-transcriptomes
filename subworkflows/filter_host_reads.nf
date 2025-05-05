@@ -177,8 +177,8 @@ workflow filter_host_reads {
         convert_graft_reads2(filter_host_reads_bam.out.bam_filtered_graft, fastq_reads)
 
     emit:
-       fastq_graft = convert_graft_reads.out.fastq_graft
-       stats_filt = convert_graft_reads.out.stats_fastq_filt
+       fastq_graft = convert_graft_reads2.out.fastq_graft
+       stats_filt = convert_graft_reads2.out.stats_fastq_filt
 
 }
 
