@@ -1,8 +1,8 @@
-params.filteredFastqOut="${params.out_dir}/fastq_filtered_graft"
+//params.jaffalout="${params.out_dir}/jaffal_outdir"
 
 
 process jaffal{
-    label "isoforms"
+    label "jaffal_dev"
 
     publishDir (
         params.out_dir,
