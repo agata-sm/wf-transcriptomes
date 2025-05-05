@@ -1,6 +1,15 @@
+params.filteredFastqOut="${params.out_dir}/fastq_filtered_graft"
+
 
 process jaffal{
     label "isoforms"
+
+    publishDir (
+        params.out_dir,
+        mode: "copy",
+        saveAs: { dirname ? "$dirname/$fname" : fname }
+    )
+
     input:
         tuple val(sample_id), path(fastq)
         path refBase

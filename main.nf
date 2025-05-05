@@ -437,21 +437,21 @@ process collectFastqIngressResultsInDir {
 // publish files from a workflow whilst decoupling the publish from the process steps.
 // The process takes a tuple containing the filename and the name of a sub-directory to
 // put the file into. If the latter is `null`, puts it into the top-level directory.
-process output {
-    // publish inputs to output directory
-    label "isoforms"
-    publishDir (
-        params.out_dir,
-        mode: "copy",
-        saveAs: { dirname ? "$dirname/$fname" : fname }
-    )
-    input:
-        tuple path(fname), val(dirname)
-    output:
-        path fname
-    """
-    """
-}
+// process output {
+//     // publish inputs to output directory
+//     label "isoforms"
+//     publishDir (
+//         params.out_dir,
+//         mode: "copy",
+//         saveAs: { dirname ? "$dirname/$fname" : fname }
+//     )
+//     input:
+//         tuple path(fname), val(dirname)
+//     output:
+//         path fname
+//     """
+//     """
+// }
 
 
 // workflow module
@@ -811,7 +811,7 @@ workflow {
                 jaffal_refBase, params.jaffal_genome, params.jaffal_annotation,
                 condition_sheet, ref_transcriptome,ref_genome_host)
 
-        output(pipeline.out.results)
+        //output(pipeline.out.results)
 
     }
 }
