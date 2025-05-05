@@ -2,7 +2,8 @@
 Subworkflow for filtering host reads from xenograft samples
 Map to both genomes separateply (use previously mapped reads for graft - product of subworkflow map_reads_all_genome)
 Filter using XenofileR
-bam to fastq using samtools
+prev used bam to fastq using samtools produced fragmented reads
+extract read ids from bam and use these to subset fastq files
 */
 
 
@@ -87,7 +88,6 @@ process filter_host_reads_bam{
     */
 
 	label "xenofilter"
-    cpus 8
 
     input:
     tuple val(sample_id), path(mapped_graft_bam)
@@ -130,6 +130,35 @@ process convert_graft_reads{
 
 }
 
+process convert_graft_reads2{
+    /*
+    bam to fastq conversion
+    */
+
+    label "isoforms"
+    cpus params.threads
+
+    publishDir params.filteredFastqOut, mode:'copy'
+
+    input:
+    tuple val(sample_id), path(bam_filtered_graft), path(bam_filtered_graft_bai)
+    tuple val(sample_id), path (full_len_reads_host_graft)
+
+    output:
+    tuple val(sample_id), path("${sample_id}.filtered.graft.fastq"), emit: fastq_graft
+    tuple val(sample_id), path("${sample_id}.host_filtering_stats.txt"), emit: stats_fastq_filt
+
+    script:
+    """
+    samtools view ${bam_filtered_graft} | cut -f 1 | awk '!x[\$0]++' >reads_host.txt
+
+    filterbyname.sh in=${full_len_reads_host_graft} out=${sample_id}.filtered.graft.fastq names=reads_host.txt substring=t include=t
+
+    wc -l ${sample_id}.filtered.graft.fastq >${sample_id}.host_filtering_stats.txt
+
+    """
+
+}
 
 
 workflow filter_host_reads {
@@ -144,7 +173,8 @@ workflow filter_host_reads {
         map_reads_unfilt_graft(index, fastq_reads)
 
         filter_host_reads_bam(map_reads_unfilt_graft.out.bam_graft, map_reads_unfilt_host.out.bam_host)
-        convert_graft_reads(filter_host_reads_bam.out.bam_filtered_graft)
+        //convert_graft_reads(filter_host_reads_bam.out.bam_filtered_graft)
+        convert_graft_reads2(filter_host_reads_bam.out.bam_filtered_graft, fastq_reads)
 
     emit:
        fastq_graft = convert_graft_reads.out.fastq_graft

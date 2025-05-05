@@ -14,7 +14,7 @@
     * read mapping statistics; 
     * transcriptome quantification using salmon independent on the DE analysis;
     * host reads removal
-(Agata Smialowska 2023)
+(Agata Smialowska 2023-2025)
 */
 
 
