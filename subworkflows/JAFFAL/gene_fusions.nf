@@ -2,7 +2,7 @@
 
 
 process jaffal{
-    label "jaffal_dev"
+    label "jaffaldev"
 
     publishDir (
         params.out_dir,

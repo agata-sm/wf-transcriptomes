@@ -7,7 +7,7 @@
 
 /* Changes for long read xenograft data, processed via SLURM on Rackham / Uppmax
 * support for SLURM
-* resource usage optimised for Rackham
+* resource usage optimised for Dardel
 * using singularity / apptainer (via the provided Docker contanier)
 * more comprehensive output file saving
 * subworkflows added: 
@@ -43,14 +43,19 @@ params.mappedAllTrxOut="${params.out_dir}/bam_minimap_transcriptome_filt"
 params.salmonOut="${params.out_dir}/salmon"
 params.filteredFastqOut="${params.out_dir}/fastq_filtered_graft"
 
+// added 6v2025
+params.execOut="${params.out_dir}/pipeline_params"
+
 // default for when not filtering
 params.host_filter = null
 
 OPTIONAL_FILE = file("$projectDir/data/OPTIONAL_FILE")
 
 process getVersions {
-    label "isoforms"
-    cpus 1
+    label 'isoforms_small'
+
+    publishDir params.execOut, mode:'copy'
+
     output:
         path "versions.txt"
     script:
@@ -75,8 +80,10 @@ process getVersions {
 
 
 process getParams {
-    label "isoforms"
-    cpus 1
+    label 'isoforms_small'
+
+    publishDir params.execOut, mode:'copy'
+
     output:
         path "params.json"
     script:
@@ -93,7 +100,7 @@ process preprocess_reads {
     Optionally classify, trim, and orient cDNA reads using pychopper
     */
 
-    label "isoforms"
+    label 'isoforms'
     //cpus 4
 
     //added (AS 29v2023)
@@ -121,7 +128,7 @@ process build_minimap_index{
     /*
     Build minimap index from reference genome
     */
-    label "isoforms"
+    label 'isoforms'
     cpus params.threads
 
     input:
@@ -138,7 +145,7 @@ process build_minimap_trx_index{
     /*
     Build minimap index from reference transcriptome obtained from ref genome and gtf annotation
     */
-    label "isoforms"
+    label 'isoforms'
     cpus params.threads
 
     input:
