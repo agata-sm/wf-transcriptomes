@@ -142,17 +142,17 @@ process convert_graft_reads2{
 
     input:
     tuple val(sample_id), path(bam_filtered_graft), path(bam_filtered_graft_bai)
-    tuple val(sample_id), path (full_len_reads_host_graft)
+    tuple val(sample_id), path(full_len_reads_host_graft)
 
     output:
-    tuple val(sample_id), path("${sample_id}.filtered.graft.fastq"), emit: fastq_graft
+    tuple val(sample_id), path("${sample_id}.filtered.graft.fastq.gz"), emit: fastq_graft
     tuple val(sample_id), path("${sample_id}.host_filtering_stats.txt"), emit: stats_fastq_filt
 
     script:
     """
     samtools view ${bam_filtered_graft} | cut -f 1 | awk '!x[\$0]++' >reads_host.txt
 
-    filterbyname.sh in=${full_len_reads_host_graft} out=${sample_id}.filtered.graft.fastq names=reads_host.txt substring=t include=t
+    filterbyname.sh in=${full_len_reads_host_graft} out=${sample_id}.filtered.graft.fastq.gz names=reads_host.txt substring=t include=t
 
     wc -l ${sample_id}.filtered.graft.fastq >${sample_id}.host_filtering_stats.txt
 

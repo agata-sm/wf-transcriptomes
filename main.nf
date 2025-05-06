@@ -110,11 +110,11 @@ process preprocess_reads {
     input:
         tuple val(meta), path(input_reads)
     output:
-         tuple val("${meta.alias}"), path("${meta.alias}_full_length_reads.fastq"), emit: full_len_reads
+         tuple val("${meta.alias}"), path("${meta.alias}_full_length_reads.fastq.gz"), emit: full_len_reads
          path '*.tsv',  emit: report
     script:
         """
-        pychopper -t ${params.threads} ${params.pychopper_opts} ${input_reads} ${meta.alias}_full_length_reads.fastq
+        pychopper -t ${params.threads} ${params.pychopper_opts} ${input_reads} ${meta.alias}_full_length_reads.fastq.gz
         mv pychopper.tsv ${meta.alias}_pychopper.tsv
         workflow-glue generate_pychopper_stats --data ${meta.alias}_pychopper.tsv --output .
 

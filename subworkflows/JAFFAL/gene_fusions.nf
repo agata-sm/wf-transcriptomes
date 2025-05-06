@@ -1,5 +1,4 @@
-//params.jaffalout="${params.out_dir}/jaffal_outdir"
-
+// this version uses my own container, therefore paths are different to the original workflow
 
 process jaffal{
     label "jaffaldev"
@@ -23,15 +22,13 @@ process jaffal{
     JAFFAOUT=jaffal_output_$sample_id
 
     # JAFFAL exists with status code 1 when there's 0 fusion hits. Prevent this with '||:'
-    # added -p qin=33  to prevent error due to changes in phred base encoding: Changed from ASCII-33 to ASCII-64 on input Z: 90 -> 59
-    $params.jaffal_dir/tools/bin/bpipe run \
+    bpipe run \
         -n $params.threads \
         -p jaffa_output="\$JAFFAOUT/" \
         -p refBase=$refBase \
         -p genome=$genome \
         -p annotation=$annotation \
-        -p fastqInputFormat="*.fastq" \
-        -p qin=33 \
+        -p fastqInputFormat="*.fastq.gz" \
         $params.jaffal_dir/JAFFAL.groovy \
         $fastq || :
 
