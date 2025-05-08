@@ -152,7 +152,7 @@ process convert_graft_reads2{
     """
     samtools view ${bam_filtered_graft} | cut -f 1 | awk '!x[\$0]++' >reads_host.txt
 
-    $params.jaffal_dir/tools/bin/filterbyname -Xmx${task.memory.giga}g in=${full_len_reads_host_graft} out=${sample_id}.filtered.graft.fastq.gz names=reads_host.txt substring=t include=t
+    $params.jaffal_dir/tools/bin/filterbyname -Xmx${task.memory.giga}g qin=33 in=${full_len_reads_host_graft} out=${sample_id}.filtered.graft.fastq.gz names=reads_host.txt substring=t include=t
 
     wc -l ${sample_id}.filtered.graft.fastq >${sample_id}.host_filtering_stats.txt
     """
