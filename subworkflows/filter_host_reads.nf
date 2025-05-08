@@ -181,7 +181,7 @@ process convert_graft_reads3{
     """
     samtools view ${bam_filtered_graft} | cut -f 1 | awk '!x[\$0]++' >reads_host.txt
     
-    seqkit grep --pattern-file reads_host.txt ${full_len_reads_host_graft} > ${sample_id}.filtered.graft.fastq.gz
+    seqkit grep --pattern-file reads_host.txt ${full_len_reads_host_graft} | bgzip -c -@ ${params.threads} > ${sample_id}.filtered.graft.fastq.gz
 
     echo "read ids" >>${sample_id}.host_filtering_stats.txt
     wc -l reads_host.txt >>${sample_id}.host_filtering_stats.txt

@@ -48,7 +48,7 @@ process jaffal{
             mv tmp \$JAFFAOUT/${sample_id}_jaffa_results.csv
         fi
     else
-        echo JAFFAL encountered an error while prosessing ${sample_id}
+        echo JAFFAL encountered an error while processing ${sample_id}
     fi
     """
 }
