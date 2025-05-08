@@ -183,8 +183,6 @@ process convert_graft_reads3{
     
     seqkit grep --pattern-file reads_host.txt ${full_len_reads_host_graft} > ${sample_id}.filtered.graft.fastq.gz
 
-    echo "fastq lines" >>${sample_id}.host_filtering_stats.txt
-    wc -l ${sample_id}.filtered.graft.fastq >>${sample_id}.host_filtering_stats.txt
     echo "read ids" >>${sample_id}.host_filtering_stats.txt
     wc -l reads_host.txt >>${sample_id}.host_filtering_stats.txt
     """
