@@ -38,6 +38,7 @@ process map_reads_unfilt_host{
     */
     label "isoforms"
     cpus params.threads
+    tag {sample_id}
 
     input:
        path index_host
@@ -63,6 +64,7 @@ process map_reads_unfilt_graft{
     */
     label "isoforms"
     cpus params.threads
+    tag {sample_id}
 
     input:
        path index
@@ -88,6 +90,7 @@ process filter_host_reads_bam{
     */
 
 	label "xenofilter"
+    tag {sample_id}
 
     input:
     tuple val(sample_id), path(mapped_graft_bam)
@@ -166,6 +169,7 @@ process convert_graft_reads3{
 
     label "isoforms"
     cpus params.threads
+    tag {sample_id}
 
     publishDir params.filteredFastqOut, mode:'copy'
 

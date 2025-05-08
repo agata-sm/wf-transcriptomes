@@ -9,6 +9,7 @@ process map_reads_all{
     */
     label "isoforms"
     cpus params.threads
+    tag {sample_id}
 
 
     //added (AS 29v2023)

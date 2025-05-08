@@ -2,6 +2,7 @@
 
 process jaffal{
     label "jaffaldev"
+    tag {sample_id}
 
     publishDir (
         params.out_dir,

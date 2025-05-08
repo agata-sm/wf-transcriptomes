@@ -99,6 +99,7 @@ process preprocess_reads {
     Concatenate reads from a sample directory.
     Optionally classify, trim, and orient cDNA reads using pychopper
     */
+    tag {sample_id}
 
     label 'isoforms'
     //cpus 4
@@ -174,6 +175,7 @@ process split_bam{
 
     label 'isoforms'
     cpus params.threads
+    tag {sample_id}
 
     input:
         tuple val(sample_id), path(bam)
@@ -219,6 +221,7 @@ process assemble_transcripts{
     */
     label 'isoforms'
     cpus params.threads
+    tag {sample_id}
 
     input:
         tuple val(sample_id), path(bam)
@@ -241,6 +244,7 @@ process merge_gff_bundles{
     Merge gff bundles into a single gff file per sample.
     */
     label 'isoforms'
+    tag {sample_id}
 
     input:
         tuple val(sample_id), path (gff_bundle)
@@ -268,6 +272,7 @@ process run_gffcompare{
     */
 
     label 'isoforms'
+    tag {sample_id}
 
     input:
        tuple val(sample_id), path(query_annotation)
@@ -306,6 +311,7 @@ process get_transcriptome{
         Write out a transcriptome file based on the query gff annotations.
         */
         label 'isoforms'
+        tag {sample_id}
 
         input:
             tuple val(sample_id), path(transcripts_gff), path(gffcmp_dir), path(reference_seq)
@@ -327,6 +333,8 @@ process get_transcriptome{
 process merge_transcriptomes {
     // Merge the transcriptomes from all samples
     label 'isoforms'
+    tag {sample_id}
+
     input:
         path "query_annotations/*"
         path ref_annotation
@@ -349,6 +357,7 @@ process merge_transcriptomes {
 
 process makeReport {
 
+    tag {sample_id}
     label "isoforms"
 
     input:
@@ -419,6 +428,8 @@ process makeReport {
 // into it.
 process collectFastqIngressResultsInDir {
     label "isoforms"
+    tag {sample_id}
+
     input:
         // both the fastcat seqs as well as stats might be `OPTIONAL_FILE` --> stage in
         // different sub-directories to avoid name collisions
