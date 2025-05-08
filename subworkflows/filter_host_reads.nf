@@ -159,6 +159,37 @@ process convert_graft_reads2{
 
 }
 
+process convert_graft_reads3{
+    /*
+    fastq filtering based on read names in filtered bam
+    */
+
+    label "isoforms"
+    cpus params.threads
+
+    publishDir params.filteredFastqOut, mode:'copy'
+
+    input:
+    tuple val(sample_id), path(bam_filtered_graft), path(bam_filtered_graft_bai)
+    tuple val(sample_id), path(full_len_reads_host_graft)
+
+    output:
+    tuple val(sample_id), path("${sample_id}.filtered.graft.fastq.gz"), emit: fastq_graft
+    tuple val(sample_id), path("${sample_id}.host_filtering_stats.txt"), emit: stats_fastq_filt
+
+    script:
+    """
+    samtools view ${bam_filtered_graft} | cut -f 1 | awk '!x[\$0]++' >reads_host.txt
+    
+    seqkit grep --pattern-file reads_host.txt ${full_len_reads_host_graft} > ${sample_id}.filtered.graft.fastq.gz
+
+    echo "fastq lines" >>${sample_id}.host_filtering_stats.txt
+    wc -l ${sample_id}.filtered.graft.fastq >>${sample_id}.host_filtering_stats.txt
+    echo "read ids" >>${sample_id}.host_filtering_stats.txt
+    wc -l reads_host.txt >>${sample_id}.host_filtering_stats.txt
+    """
+
+}
 
 workflow filter_host_reads {
     take:
@@ -173,7 +204,7 @@ workflow filter_host_reads {
 
         filter_host_reads_bam(map_reads_unfilt_graft.out.bam_graft, map_reads_unfilt_host.out.bam_host)
         //convert_graft_reads(filter_host_reads_bam.out.bam_filtered_graft)
-        convert_graft_reads2(filter_host_reads_bam.out.bam_filtered_graft, fastq_reads)
+        convert_graft_reads3(filter_host_reads_bam.out.bam_filtered_graft, fastq_reads)
 
     emit:
        fastq_graft = convert_graft_reads2.out.fastq_graft
