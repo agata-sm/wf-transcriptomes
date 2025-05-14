@@ -360,7 +360,7 @@ process makeReport {
     tag {sample_id}
     label "isoforms"
 
-    publishDir "${params.out_dir}/wf-transcriptomes-report/${sample_id}", mode:'copy'
+    publishDir "${params.out_dir}", mode:'copy'
 
 
     input:
@@ -431,9 +431,8 @@ process makeReport {
 // into it.
 process collectFastqIngressResultsInDir {
     label "isoforms"
-    tag {sample_id}
 
-    publishDir "${params.out_dir}/fastq_ingress_results/${sample_id}", mode:'copy'
+    publishDir "${params.out_dir}/fastq_ingress_results/${meta["alias"]}", mode:'copy'
 
 
     input:

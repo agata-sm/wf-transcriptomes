@@ -177,7 +177,7 @@ process convert_graft_reads3{
     tag {sample_id}
 
     //publishDir params.filteredFastqOut, mode:'copy'
-    publishDir "${params.outdir}/filteredFastqOut/${sample_id}", mode:'copy'
+    publishDir "${params.out_dir}/filteredFastqOut/${sample_id}", mode:'copy'
 
     input:
     tuple val(sample_id), path(bam_filtered_graft), path(bam_filtered_graft_bai)

@@ -21,6 +21,7 @@ process jaffal{
     output:
         tuple val(sample_id), path("jaffal_output_$sample_id"), emit: results
         tuple val(sample_id), path("jaffal_output_$sample_id/*jaffa_results.csv"), emit: results_csv
+    
     script:
     """
     JAFFAOUT=jaffal_output_$sample_id
