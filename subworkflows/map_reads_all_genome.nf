@@ -1,4 +1,4 @@
-params.mappedAllOut="${params.out_dir}/bam_minimap_genome_all"
+//params.mappedAllOut="${params.out_dir}/bam_minimap_genome_all"
 
 
 process map_reads_all{
@@ -13,8 +13,8 @@ process map_reads_all{
 
 
     //added (AS 29v2023)
-    publishDir params.mappedAllOut, mode:'copy'
-
+    //publishDir params.mappedAllOut, mode:'copy'
+    publishDir "${params.out_dir}/bam_minimap_genome_all/${sample_id}", mode:'copy'
 
 
     input:

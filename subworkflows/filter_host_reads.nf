@@ -7,7 +7,7 @@ extract read ids from bam and use these to subset fastq files
 */
 
 
-params.filteredFastqOut="${params.out_dir}/fastq_filtered_graft"
+//params.filteredFastqOut="${params.out_dir}/fastq_filtered_graft"
 params.scriptDir="${projectDir}/bin"
 
 
@@ -112,6 +112,8 @@ process convert_graft_reads{
     bam to fastq conversion
     */
 
+    //process unused - converts bam to fastq
+
     label "isoforms"
     cpus params.threads
 
@@ -137,6 +139,9 @@ process convert_graft_reads2{
     /*
     fastq filtering based on read names in filtered bam
     */
+
+    //process obsolete - takes too long
+
 
     label "isoforms"
     cpus params.threads
@@ -171,7 +176,8 @@ process convert_graft_reads3{
     cpus params.threads
     tag {sample_id}
 
-    publishDir params.filteredFastqOut, mode:'copy'
+    //publishDir params.filteredFastqOut, mode:'copy'
+    publishDir "${params.outdir}/filteredFastqOut/${sample_id}", mode:'copy'
 
     input:
     tuple val(sample_id), path(bam_filtered_graft), path(bam_filtered_graft_bai)

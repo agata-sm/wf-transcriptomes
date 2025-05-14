@@ -34,18 +34,6 @@ include { map_reads_all_transcriptome } from './subworkflows/map_reads_all_trans
 include { filter_host_reads } from './subworkflows/filter_host_reads'
 
 
-// added 29 v 2023
-// save additional output files
-params.fastqprocOut="${params.out_dir}/fastq_pychopper"
-params.mappedOut="${params.out_dir}/bam_minimap_genome_mapped"
-params.mappedAllOut="${params.out_dir}/bam_minimap_genome_all"
-params.mappedAllTrxOut="${params.out_dir}/bam_minimap_transcriptome_filt"
-params.salmonOut="${params.out_dir}/salmon"
-params.filteredFastqOut="${params.out_dir}/fastq_filtered_graft"
-
-// added 6v2025
-params.execOut="${params.out_dir}/pipeline_params"
-
 // default for when not filtering
 params.host_filter = null
 
@@ -54,7 +42,7 @@ OPTIONAL_FILE = file("$projectDir/data/OPTIONAL_FILE")
 process getVersions {
     label 'isoforms_small'
 
-    publishDir params.execOut, mode:'copy'
+    publishDir "${params.out_dir}/pipeline_params", mode:'copy'
 
     output:
         path "versions.txt"
@@ -82,7 +70,9 @@ process getVersions {
 process getParams {
     label 'isoforms_small'
 
-    publishDir params.execOut, mode:'copy'
+    //publishDir params.execOut, mode:'copy'
+    publishDir "${params.out_dir}/pipeline_params", mode:'copy'
+
 
     output:
         path "params.json"
@@ -105,7 +95,8 @@ process preprocess_reads {
     //cpus 4
 
     //added (AS 29v2023)
-    publishDir params.fastqprocOut, mode:'copy'
+    //publishDir params.fastqprocOut, mode:'copy'
+    publishDir "${params.out_dir}/fastq_pychopper", mode:'copy'
 
 
     input:
@@ -170,7 +161,7 @@ process split_bam{
     Partition BAM file into loci or bundles with `params.bundle_min_reads` minimum size
     If no splitting required, just create single symbolic link to a single bundle.
 
-    Output tuples containing `sample_id` so bundles can be combined later in th pipeline.
+    Output tuples containing `sample_id` so bundles can be combined later in the pipeline.
     */
 
     label 'isoforms'
@@ -246,6 +237,9 @@ process merge_gff_bundles{
     label 'isoforms'
     tag {sample_id}
 
+    publishDir "${params.out_dir}/merged_gff/${sample_id}", mode:'copy'
+
+
     input:
         tuple val(sample_id), path (gff_bundle)
     output:
@@ -274,12 +268,15 @@ process run_gffcompare{
     label 'isoforms'
     tag {sample_id}
 
+    publishDir "${params.out_dir}/gffcompare/${sample_id}_gffcompare", mode:'copy'
+
+
     input:
        tuple val(sample_id), path(query_annotation)
        path ref_annotation
     output:
         tuple val(sample_id), path("${sample_id}_gffcompare"), emit: gffcmp_dir
-        path ("${sample_id}_annotated.gtf"), emit: gtf, optional: true
+        path ("${sample_id}_annotated.gtf"), emit: gtf
     script:
     def out_dir = "${sample_id}_gffcompare"
 
@@ -312,6 +309,9 @@ process get_transcriptome{
         */
         label 'isoforms'
         tag {sample_id}
+    
+        publishDir "${params.out_dir}/transcriptome/${sample_id}", mode:'copy'
+
 
         input:
             tuple val(sample_id), path(transcripts_gff), path(gffcmp_dir), path(reference_seq)
@@ -359,6 +359,9 @@ process makeReport {
 
     tag {sample_id}
     label "isoforms"
+
+    publishDir "${params.out_dir}/wf-transcriptomes-report/${sample_id}", mode:'copy'
+
 
     input:
         path versions
@@ -429,6 +432,9 @@ process makeReport {
 process collectFastqIngressResultsInDir {
     label "isoforms"
     tag {sample_id}
+
+    publishDir "${params.out_dir}/fastq_ingress_results/${sample_id}", mode:'copy'
+
 
     input:
         // both the fastcat seqs as well as stats might be `OPTIONAL_FILE` --> stage in

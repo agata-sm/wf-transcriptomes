@@ -1,4 +1,4 @@
-params.mappedOut="${params.out_dir}/bam_minimap_genome_mapped"
+//params.mappedOut="${params.out_dir}/bam_minimap_genome_mapped"
 
 process map_reads{
     /*
@@ -10,7 +10,8 @@ process map_reads{
     cpus params.threads
 
     //added (AS 29v2023)
-    publishDir params.mappedOut, mode:'copy'
+    //publishDir params.mappedOut, mode:'copy'
+    publishDir "${params.outdir}/bam_minimap_genome_mapped/${sample_id}", mode:'copy'
 
 
 

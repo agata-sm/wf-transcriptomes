@@ -4,11 +4,14 @@ process jaffal{
     label "jaffaldev"
     tag {sample_id}
 
-    publishDir (
-        params.out_dir,
-        mode: "copy",
-        saveAs: { dirname ? "$dirname/$fname" : fname }
-    )
+  
+    publishDir "${params.out_dir}/jaffal", mode:'copy'
+
+    // publishDir (
+    //     params.out_dir,
+    //     mode: "copy",
+    //     saveAs: { dirname ? "$dirname/$fname" : fname }
+    // )
 
     input:
         tuple val(sample_id), path(fastq)

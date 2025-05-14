@@ -1,5 +1,5 @@
-params.mappedAllTrxOut="${params.out_dir}/bam_minimap_transcriptome_filt"
-params.salmonOut="${params.out_dir}/salmon"
+//params.mappedAllTrxOut="${params.out_dir}/bam_minimap_transcriptome_filt"
+//params.salmonOut="${params.out_dir}/salmon"
 
 
 process map_reads_trx_all{
@@ -12,7 +12,8 @@ process map_reads_trx_all{
 
 
     //added (AS 29v2023)
-    publishDir params.mappedAllTrxOut, mode:'copy'
+    //publishDir params.mappedAllTrxOut, mode:'copy'
+    publishDir "${params.outdir}/bam_minimap_transcriptome_filt/${sample_id}", mode:'copy'
 
 
 
@@ -43,7 +44,9 @@ process salmon{
 
 
     //added (AS 29v2023)
-    publishDir params.salmonOut, mode:'copy'
+    //publishDir params.salmonOut, mode:'copy'
+    publishDir "${params.outdir}/salmon/${sample_id}", mode:'copy'
+
 
     input:
        tuple val(sample_id), path(bam)
